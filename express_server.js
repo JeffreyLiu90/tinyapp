@@ -3,6 +3,9 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+const morgan = require('morgan');
+app.set('view engine', 'ejs');
+app.use(morgan('dev'));
 
 
   function generateRandomString() {
@@ -68,3 +71,9 @@ app.post("/urls", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL]; // go into the object and find the long link
     res.redirect(longURL); // redirect to the original link
   });
+
+  app.post("/urls/:shortURL/delete", (req, res) =>{
+delete urlDatabase[req.params.shortURL];
+res.redirect("/urls")
+
+  })
