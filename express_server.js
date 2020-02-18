@@ -49,13 +49,22 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+
+
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL:urlDatabase[req.params.shortURL]}; // the shortURL is the path name and what is after 
   res.render("urls_show", templateVars); // goes to folder views, ejs file named urls_index and display the info
 });// throws in the templateVars which define variables into the urls_show
 
-app.post("/urls", (req, res) => {
-console.log(req.body); // log the POST request body to console
-res.send("ok") // responds with OK (will be replaced)
-})
 
+app.post("/urls", (req, res) => {
+  // console.log(req.body); // log the POST request body to console
+  let newShortURL = generateRandomString()
+  urlDatabase[newShortURL] = req.body.longURL
+  res.redirect(`/urls/${newShortURL}`) // redirects to shortURL above, with the new generated code
+  })
+  
+  app.get("/u/:shortURL", (req, res) => { // the short URL is clickable, so clicking it directs to the following code
+    const longURL = urlDatabase[req.params.shortURL]; // go into the object and find the long link
+    res.redirect(longURL); // redirect to the original link
+  });
