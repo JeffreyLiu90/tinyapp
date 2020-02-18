@@ -77,3 +77,13 @@ delete urlDatabase[req.params.shortURL];
 res.redirect("/urls")
 
   })
+
+
+  app.post("/urls/:shortURL", (req, res) => {
+    let key = req.params.shortURL
+ urlDatabase[key] = req.body.longURL
+
+
+
+    res.redirect("/urls")
+  })
