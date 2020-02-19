@@ -10,11 +10,14 @@
 </head>
 <body>
 
+  <!-- imports the header partial via path -->
   <%- include('partials/_header') %>
       
   <main style="margin: 1em;">
     <h3>My URLs</h3>
 
+
+    <!-- Creates table of buttons -->
     <table class="table">
       <thead>
         <tr>
@@ -23,7 +26,7 @@
           <th scope="=col">Edit</th>
           <th scope="=col">Delete</th>
 
-
+<!-- the buttons with their functions, clicking edit button goes to the edit page with short urls param, goes to delete page, links to the action in express that deletes and goes back to urls-->
         </tr>
       </thead>
       <tbody>
@@ -31,9 +34,9 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
-            <td><form method="GET" action="urls/<%=url%>"> <button>Edit</button></form> </td>
-            <td><form method="POST" action="urls/<%=url%>/delete"> <button>Delete</button></form> </td>
-            
+            <td><form method="GET" action="urls/<%=url%>"> <button type="button" class="btn btn-outline-info">Edit</button></form> </td>
+            <td><form method="POST" action="urls/<%=url%>/delete"> <button type="button" class="btn btn-outline-danger">Delete</button></form> </td>
+          
           </tr>
         <% } %>
       </tbody>
