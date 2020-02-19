@@ -13,6 +13,8 @@ app.use(morgan('dev'));
 
 
 
+
+
 //Generates a random number with 6 digits
 function generateRandomString() {
   var result = '';
@@ -21,6 +23,14 @@ function generateRandomString() {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
+}
+
+const validateEmail = function(email) {
+  for(let usersKey in users) {
+    if(users[usersKey].email === email){
+      return true
+    }
+  }return false
 }
 
 
@@ -32,6 +42,21 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+
+const users = { 
+  "userRandomID": {
+    id: "id", 
+    email: "jeffrey.liu90@gmail.com", 
+    password: "123"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 
 // Going to root, you will see Hello!
 app.get("/", (req, res) => {
@@ -87,7 +112,7 @@ app.post("/urls", (req, res) => {
   // console.log(req.body); // log the POST request body to console
   let newShortURL = generateRandomString()
   urlDatabase[newShortURL] = req.body.longURL
-  res.redirect(`/urls/${newShortURL}`) // redirects to shortURL above, with the new generated code
+  res.redirect(`/urls`) // redirects to main urls page
 })
 
 
@@ -122,4 +147,42 @@ app.post("/logout", (req, res) => {
 
   res.redirect('/urls')
 
+  
 })
+
+app.get("/register", (req, res) => {
+  
+  let templateVars = {
+    username: req.cookies["username"],
+  }
+  res.render("register",templateVars);
+});
+
+
+
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+
+  if(email === "" || password === ""){
+    res.statusCode = 400
+    res.send(res.statusCode)
+  } else if(validateEmail(email)){
+res.statusCode = 400
+res.send(res.statusCode)
+  } else {
+let id = generateRandomString()
+users[id] = {
+  id,
+  email, 
+  password
+}
+
+
+
+res.cookie("user_id", id )
+console.log(id)
+console.log(users[id])
+res.redirect("/urls")
+}})
+
+// res.cookies["user_id"]
