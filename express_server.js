@@ -37,7 +37,7 @@ const validatePassword = function (email, password) {
   for (let userKey in users) {
     if (users[userKey].email === email) {
       if (users[userKey].password === password) {
-        return true
+        return users[userKey] // returns the specific object of user
       }
     }
   } return false
@@ -54,7 +54,7 @@ const urlDatabase = {
 
 const users = {
   "userRandomID": {
-    id: "id",
+    id: "userRandomID",
     email: "jeffrey.liu90@gmail.com",
     password: "123"
   },
@@ -152,8 +152,9 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //goes to logout page, where it clears cookies, and then directs back to main page
 app.post("/logout", (req, res) => {
+ 
   // res.clearCookie("user", req.body.username)
-  res.clearCookie("user", req.body.email)
+  res.clearCookie("user_id") // clear the whole user object cookie
   res.redirect('/urls')
 
 
@@ -181,21 +182,22 @@ app.get("/login", (req, res) => {
 
 
 app.post("/login", (req, res) => {
-console.log(users)
+// console.log(users)
   const { email, password } = req.body;
+  var user;
   if (validateEmail(email) === false) {
     res.statusCode = 403
     res.send(res.statusCode)
-  } else if (validatePassword(email, password) === false) {
+  } else if (user = validatePassword(email, password)) { // let user be the user object that was returned
+    res.cookie("user_id", user.id) // request the cookie from the id of that specific user
+    res.redirect("/urls")
+    console.log(user)
+   
+  } else {
     res.statusCode = 403
     res.send(res.statusCode)
-  } else {
-    const user = {
-      email,
-      password
-    }
-    res.cookie("user_id", user)
-    res.redirect("/urls")
+    
+  
   }
 })
 
@@ -220,7 +222,7 @@ app.post("/register", (req, res) => {
     }
     res.cookie("user_id", id)
 
-    console.log(users[id])
+    // console.log(users[id])
     res.redirect("/urls")
   }
 })
