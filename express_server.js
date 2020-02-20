@@ -25,15 +25,23 @@ function generateRandomString() {
   return result;
 }
 
-const validateEmail = function(email) {
-  for(let usersKey in users) {
-    if(users[usersKey].email === email){
+const validateEmail = function (email) {
+  for (let usersKey in users) {
+    if (users[usersKey].email === email) {
       return true
     }
-  }return false
+  } return false
 }
 
-
+const validatePassword = function (email, password) {
+  for (let userKey in users) {
+    if (users[userKey].email === email) {
+      if (users[userKey].password === password) {
+        return true
+      }
+    }
+  } return false
+}
 
 app.set("view engine", "ejs");
 
@@ -44,18 +52,20 @@ const urlDatabase = {
 };
 
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "id", 
-    email: "jeffrey.liu90@gmail.com", 
+    id: "id",
+    email: "jeffrey.liu90@gmail.com",
     password: "123"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
 }
+
+
 
 
 // Going to root, you will see Hello!
@@ -81,7 +91,8 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]]
+    // user_id: req.cookies["user_id"]
   };
   res.render("urls_index", templateVars); // goes to folder views, ejs file named urls_index and display the info
 });
@@ -90,7 +101,8 @@ app.get("/urls", (req, res) => {
 // exports the display name onto the page where you are creating a new username
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]]
+    // user_id: req.cookies["user_id"]
   }
   res.render("urls_new", templateVars);
 });
@@ -101,7 +113,9 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
+    // user_id: req.cookies["user_id"]
+
   }; // the shortURL is the path name and what is after 
   res.render("urls_show", templateVars);
   return // goes to folder views, ejs file named urls_index and display the info
@@ -134,55 +148,81 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls")
 })
 
-// goes to log in page, once enter info, remembers cookies
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username)
 
-  res.redirect('/urls')
-})
 
 //goes to logout page, where it clears cookies, and then directs back to main page
 app.post("/logout", (req, res) => {
-  res.clearCookie("username", req.body.username)
-
+  // res.clearCookie("user", req.body.username)
+  res.clearCookie("user", req.body.email)
   res.redirect('/urls')
 
-  
+
 })
 
 app.get("/register", (req, res) => {
-  
+
   let templateVars = {
-    username: req.cookies["username"],
+    // username: req.cookies["username"],
+    user: users[req.cookies["user_id"]]
   }
-  res.render("register",templateVars);
+  res.render("register", templateVars);
 });
+
+
+app.get("/login", (req, res) => {
+
+  let templateVars = {
+    // username: req.cookies["username"],
+    user: users[req.cookies["user_id"]]
+  }
+
+  res.render("login", templateVars);
+});
+
+
+app.post("/login", (req, res) => {
+console.log(users)
+  const { email, password } = req.body;
+  if (validateEmail(email) === false) {
+    res.statusCode = 403
+    res.send(res.statusCode)
+  } else if (validatePassword(email, password) === false) {
+    res.statusCode = 403
+    res.send(res.statusCode)
+  } else {
+    const user = {
+      email,
+      password
+    }
+    res.cookie("user_id", user)
+    res.redirect("/urls")
+  }
+})
+
 
 
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
-  if(email === "" || password === ""){
+  if (email === "" || password === "") {
     res.statusCode = 400
     res.send(res.statusCode)
-  } else if(validateEmail(email)){
-res.statusCode = 400
-res.send(res.statusCode)
+  } else if (validateEmail(email)) {
+    res.statusCode = 400
+    res.send(res.statusCode)
   } else {
-let id = generateRandomString()
-users[id] = {
-  id,
-  email, 
-  password
-}
+    let id = generateRandomString()
+    users[id] = {
+      id,
+      email,
+      password
+    }
+    res.cookie("user_id", id)
+
+    console.log(users[id])
+    res.redirect("/urls")
+  }
+})
 
 
-
-res.cookie("user_id", id )
-console.log(id)
-console.log(users[id])
-res.redirect("/urls")
-}})
-
-// res.cookies["user_id"]

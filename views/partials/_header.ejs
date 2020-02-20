@@ -9,7 +9,7 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <a class="nav-item nav-link" href="/register">Register</a>
-        
+        <a class="nav-item nav-link" href="/login">Login</a>
       </div>
 
       <!-- <form class="form-inline" action="/login" method="POST">
@@ -22,21 +22,16 @@
      
 
 
-  <% if(username){ %>
+  <% if(user){ %>
 
-    <p>Logged in as <%=username%></p>
+   <p>Logged in as: <%= user.email %> </p>
     <form class="form-inline" action="/logout" method="POST">
       <div class="form-group mb-2">
         <button type="submit" class="btn btn-primary"> Logout</button>
       </div>
     </form>
         <% } else{ %>  
-          <form class="form-inline" action="/login" method="POST">
-            <div class="form-group mb-2">
-              <input class="form-control" type="text" name="username" placeholder="username" style="width: 300px; margin: 1em">
-              <button type="submit" class="btn btn-primary">Login</button>
-            </div> 
-          </form>
+     
        <% } %>
 
         
@@ -48,7 +43,7 @@
         <header>
 
 
-        <!-- <p><%=username%></p> -->
+ 
 
       
       
